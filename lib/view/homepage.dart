@@ -25,6 +25,16 @@ class _HomepageState extends State<Homepage> {
     '7th',
     '8th'
   ];
+  List<String> subjects = [
+    'First',
+    'second',
+    'Third',
+    'Fourth',
+    'Fifth',
+    'Sixth',
+    'Seventh',
+    'Eight'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -250,6 +260,21 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ],
               ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Wrap(
+              spacing: 10.0,
+              runSpacing: 10.0,
+              children: List.generate(
+                  subjects.length,
+                  (index) => Container(
+                        child: TextButton(
+                          onPressed: () {},
+                          child: Text(subjects.elementAt(index)),
+                        ),
+                      )),
             )
           ],
         ),
