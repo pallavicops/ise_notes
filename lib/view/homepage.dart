@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../control/branch_control.dart';
+import '../control/scheme_control.dart';
+import '../model/branch_model.dart';
+
 class Homepage extends StatefulWidget {
   const Homepage({Key? key}) : super(key: key);
 
@@ -8,7 +12,9 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  List<String> branches = ['ISE', 'M-Tech'];
+  final BranchControl _branchControl = BranchControl();
+  final SchemeControl _schemeControl = SchemeControl();
+  // late List<String> branches = ['ISE', 'M-Tech'];
   String? selectedItem;
   int? selectedSchemeIndex;
   List<String> schemes = [];
@@ -74,47 +80,66 @@ class _HomepageState extends State<Homepage> {
             const SizedBox(
               height: 20,
             ),
+            IconButton(
+              onPressed: () {
+                _schemeControl.getSchemes(1);
+              },
+              icon: Icon(Icons.add),
+            ),
             SizedBox(
               height: 30,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return ElevatedButton(
-                    onPressed: () {
-                      selectedItem = branches.elementAt(index);
-                      if (selectedItem == 'ISE') {
-                        schemes = iseSchemes;
-                      } else if (selectedItem == 'M-Tech') {
-                        schemes = mTechSchemes;
-                      }
-                      setState(() {});
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(
-                        branches.elementAt(index) == selectedItem
-                            ? const Color(0xFF00194C)
-                            : Colors.grey,
-                      ),
-                      shape: const MaterialStatePropertyAll(
-                        StadiumBorder(),
-                      ),
-                    ),
-                    child: Text(
-                      branches.elementAt(index),
-                      style: const TextStyle().copyWith(
-                        color: branches.elementAt(index) == selectedItem
-                            ? Colors.white
-                            : Colors.black,
-                      ),
-                    ),
-                  );
+              child: FutureBuilder(
+                future: _branchControl.getBranches(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<BranchModel>> snapshot) {
+                  if (snapshot.hasData) {
+                    final branches = snapshot.data!;
+                    return ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return ElevatedButton(
+                          onPressed: () {
+                            selectedItem = branches.elementAt(index).branchName;
+                            if (selectedItem == 'ISE') {
+                              schemes = iseSchemes;
+                            } else if (selectedItem == 'M-Tech') {
+                              schemes = mTechSchemes;
+                            }
+                            setState(() {});
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStatePropertyAll(
+                              branches.elementAt(index).branchName ==
+                                      selectedItem
+                                  ? const Color(0xFF00194C)
+                                  : Colors.grey,
+                            ),
+                            shape: const MaterialStatePropertyAll(
+                              StadiumBorder(),
+                            ),
+                          ),
+                          child: Text(
+                            branches.elementAt(index).branchName,
+                            style: const TextStyle().copyWith(
+                              color: branches.elementAt(index).branchName ==
+                                      selectedItem
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(
+                          width: 10,
+                        );
+                      },
+                      itemCount: branches.length,
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
                 },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(
-                    width: 10,
-                  );
-                },
-                itemCount: branches.length,
               ),
             ),
             const SizedBox(
