@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notes_management_system/model/scheme_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../control/branch_control.dart';
 import '../control/scheme_control.dart';
@@ -14,12 +16,13 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   final BranchControl _branchControl = BranchControl();
   final SchemeControl _schemeControl = SchemeControl();
+
   // late List<String> branches = ['ISE', 'M-Tech'];
-  String? selectedItem;
-  int? selectedSchemeIndex;
-  List<String> schemes = [];
-  List<String> iseSchemes = ['2018-Scheme', '2021-Scheme'];
-  List<String> mTechSchemes = ['MTech-2018-Scheme', 'MTech-2021-Scheme'];
+  String? selectedBranchId;
+  String? selectedSchemeId;
+  List<SchemeModel> schemes = [];
+  //List<String> iseSchemes = ['2018-Scheme', '2021-Scheme'];
+  //List<String> mTechSchemes = ['MTech-2018-Scheme', 'MTech-2021-Scheme'];
   String? selectedSem;
   List<String> semesters = [
     '1st',
@@ -80,12 +83,6 @@ class _HomepageState extends State<Homepage> {
             const SizedBox(
               height: 20,
             ),
-            IconButton(
-              onPressed: () {
-                _schemeControl.getSchemes(1);
-              },
-              icon: Icon(Icons.add),
-            ),
             SizedBox(
               height: 30,
               child: FutureBuilder(
@@ -99,18 +96,15 @@ class _HomepageState extends State<Homepage> {
                       itemBuilder: (context, index) {
                         return ElevatedButton(
                           onPressed: () {
-                            selectedItem = branches.elementAt(index).branchName;
-                            if (selectedItem == 'ISE') {
-                              schemes = iseSchemes;
-                            } else if (selectedItem == 'M-Tech') {
-                              schemes = mTechSchemes;
-                            }
+                            selectedBranchId =
+                                branches.elementAt(index).branchId;
+
                             setState(() {});
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStatePropertyAll(
-                              branches.elementAt(index).branchName ==
-                                      selectedItem
+                              branches.elementAt(index).branchId ==
+                                      selectedBranchId
                                   ? const Color(0xFF00194C)
                                   : Colors.grey,
                             ),
@@ -121,8 +115,8 @@ class _HomepageState extends State<Homepage> {
                           child: Text(
                             branches.elementAt(index).branchName,
                             style: const TextStyle().copyWith(
-                              color: branches.elementAt(index).branchName ==
-                                      selectedItem
+                              color: branches.elementAt(index).branchId ==
+                                      selectedBranchId
                                   ? Colors.white
                                   : Colors.black,
                             ),
@@ -146,7 +140,7 @@ class _HomepageState extends State<Homepage> {
               height: 10,
             ),
             Visibility(
-              visible: selectedItem != null,
+              visible: selectedBranchId != null,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -158,86 +152,128 @@ class _HomepageState extends State<Homepage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Wrap(
-                    spacing: 10.0,
-                    runSpacing: 10.0,
-                    children: List.generate(
-                      schemes.length,
-                      (index) => Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: index == selectedSchemeIndex
-                              ? const Color(0xFF00194C)
-                              : Colors.grey,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Column(
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  selectedSchemeIndex = index;
-                                  setState(() {});
-                                },
-                                child: Text(
-                                  schemes.elementAt(index),
-                                  style: const TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.bold)
-                                      .copyWith(
-                                    color: index == selectedSchemeIndex
-                                        ? Colors.white
-                                        : Colors.black,
+                  FutureBuilder(
+                      future:
+                          _schemeControl.getSchemes(selectedBranchId ?? '0'),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<SchemeModel>> snapshot) {
+                        if (snapshot.hasData) {
+                          schemes.clear();
+                          schemes = snapshot.data!;
+                          return Wrap(
+                            spacing: 10.0,
+                            runSpacing: 10.0,
+                            children: List.generate(
+                              schemes.length,
+                              (index) => Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  color: schemes.elementAt(index).schemeId ==
+                                          selectedSchemeId
+                                      ? const Color(0xFF00194C)
+                                      : Colors.grey,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Column(
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          selectedSchemeId =
+                                              schemes.elementAt(index).schemeId;
+                                          setState(() {});
+                                        },
+                                        child: Text(
+                                          schemes.elementAt(index).schemeName,
+                                          style: const TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.bold)
+                                              .copyWith(
+                                            color: schemes
+                                                        .elementAt(index)
+                                                        .schemeId ==
+                                                    selectedSchemeId
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Visibility(
+                                        visible: selectedSchemeId ==
+                                            schemes.elementAt(index).schemeId,
+                                        child: Column(
+                                          children: [
+                                            OutlinedButton(
+                                              style: OutlinedButton.styleFrom(
+                                                shape: const StadiumBorder(),
+                                                side: const BorderSide(
+                                                    width: 2,
+                                                    color: Colors.white),
+                                              ),
+                                              onPressed: () {
+                                                try {
+                                                  final uri = Uri.parse(
+                                                    schemes
+                                                        .elementAt(index)
+                                                        .downloadSchemeUrl,
+                                                  );
+                                                  launchUrl(uri);
+                                                } catch (e) {
+                                                  print(e);
+                                                }
+                                              },
+                                              child: const Text(
+                                                'Download Scheme',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            OutlinedButton(
+                                              style: OutlinedButton.styleFrom(
+                                                shape: const StadiumBorder(),
+                                                side: const BorderSide(
+                                                    width: 2,
+                                                    color: Colors.white),
+                                              ),
+                                              onPressed: () {
+                                                try {
+                                                  final uri = Uri.parse(
+                                                    schemes
+                                                        .elementAt(index)
+                                                        .downloadSyllabusUrl,
+                                                  );
+                                                  launchUrl(uri);
+                                                } catch (e) {
+                                                  print(e);
+                                                }
+                                              },
+                                              child: const Text(
+                                                'Download Syllabus',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Visibility(
-                                visible: selectedSchemeIndex == index,
-                                child: Column(
-                                  children: [
-                                    OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        shape: const StadiumBorder(),
-                                        side: const BorderSide(
-                                            width: 2, color: Colors.white),
-                                      ),
-                                      onPressed: () {},
-                                      child: const Text(
-                                        'Download Scheme',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        shape: const StadiumBorder(),
-                                        side: const BorderSide(
-                                            width: 2, color: Colors.white),
-                                      ),
-                                      onPressed: () {},
-                                      child: const Text(
-                                        'Download Syllabus',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                            ),
+                          );
+                        } else {
+                          return CircularProgressIndicator();
+                        }
+                      }),
                 ],
               ),
             ),
@@ -245,7 +281,7 @@ class _HomepageState extends State<Homepage> {
               height: 10,
             ),
             Visibility(
-              visible: selectedSchemeIndex != null,
+              visible: selectedSchemeId != null,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
