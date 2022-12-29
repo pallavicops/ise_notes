@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:notes_management_system/control/semester_control.dart';
+import 'package:notes_management_system/control/subject_control.dart';
 import 'package:notes_management_system/model/scheme_model.dart';
+import 'package:notes_management_system/model/semester_model.dart';
+import 'package:notes_management_system/model/subject_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../control/branch_control.dart';
@@ -16,34 +20,36 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   final BranchControl _branchControl = BranchControl();
   final SchemeControl _schemeControl = SchemeControl();
+  final SemesterControl _semesterControl = SemesterControl();
+  final SubjectControl _subjectControl = SubjectControl();
 
-  // late List<String> branches = ['ISE', 'M-Tech'];
   String? selectedBranchId;
   String? selectedSchemeId;
   List<SchemeModel> schemes = [];
-  //List<String> iseSchemes = ['2018-Scheme', '2021-Scheme'];
-  //List<String> mTechSchemes = ['MTech-2018-Scheme', 'MTech-2021-Scheme'];
-  String? selectedSem;
-  List<String> semesters = [
-    '1st',
-    '2nd',
-    '3rd',
-    '4th',
-    '5th',
-    '6th',
-    '7th',
-    '8th'
-  ];
-  List<String> subjects = [
-    'First',
-    'second',
-    'Third',
-    'Fourth',
-    'Fifth',
-    'Sixth',
-    'Seventh',
-    'Eight'
-  ];
+  List<SemModel> semesters = [];
+  String? selectedSemId;
+  List<SubModel> subjects = [];
+  String? selectedSubId;
+  // List<String> semesters = [
+  //   '1st',
+  //   '2nd',
+  //   '3rd',
+  //   '4th',
+  //   '5th',
+  //   '6th',
+  //   '7th',
+  //   '8th'
+  // ];
+  // List<String> subjects = [
+  //   'First',
+  //   'second',
+  //   'Third',
+  //   'Fourth',
+  //   'Fifth',
+  //   'Sixth',
+  //   'Seventh',
+  //   'Eight'
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -293,49 +299,146 @@ class _HomepageState extends State<Homepage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Wrap(
-                    spacing: 10.0,
-                    runSpacing: 10.0,
-                    children: List.generate(
-                      semesters.length,
-                      (index) => ElevatedButton(
-                        onPressed: () {
-                          selectedSem = semesters.elementAt(index);
-                          setState(() {});
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
-                            semesters.elementAt(index) == selectedSem
-                                ? const Color(0xFF00194C)
-                                : Colors.grey,
+                  FutureBuilder(
+                    future:
+                        _semesterControl.getSemesters(selectedSchemeId ?? '0'),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<SemModel>> snapshot) {
+                      if (snapshot.hasData) {
+                        semesters.clear();
+                        semesters = snapshot.data!;
+                        return Wrap(
+                          spacing: 10.0,
+                          runSpacing: 10.0,
+                          children: List.generate(
+                            semesters.length,
+                            (index) => ElevatedButton(
+                              onPressed: () {
+                                selectedSemId =
+                                    semesters.elementAt(index).semId;
+                                setState(() {});
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStatePropertyAll(
+                                  semesters.elementAt(index).semId ==
+                                          selectedSemId
+                                      ? const Color(0xFF00194C)
+                                      : Colors.grey,
+                                ),
+                                shape: const MaterialStatePropertyAll(
+                                  StadiumBorder(),
+                                ),
+                              ),
+                              child: Text(
+                                semesters.elementAt(index).semName,
+                              ),
+                            ),
                           ),
-                          shape: const MaterialStatePropertyAll(
-                            StadiumBorder(),
-                          ),
-                        ),
-                        child: Text(
-                          semesters.elementAt(index),
-                        ),
-                      ),
-                    ),
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+                    },
                   ),
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              children: List.generate(
-                  subjects.length,
-                  (index) => Container(
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(subjects.elementAt(index)),
-                        ),
-                      )),
+            Visibility(
+              visible: selectedSemId != null,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Select your Subject",
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      height: 250,
+                      child: FutureBuilder(
+                        future:
+                            _subjectControl.getSubjects(selectedSemId ?? '0'),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<SubModel>> snapshot) {
+                          if (snapshot.hasData) {
+                            subjects.clear();
+                            subjects = snapshot.data!;
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: Wrap(
+                                spacing: 20.0,
+                                runSpacing: 20.0,
+                                children: List.generate(
+                                  subjects.length,
+                                  (index) => Container(
+                                    padding: const EdgeInsets.all(10.0),
+                                    decoration: BoxDecoration(
+                                      color: subjects.elementAt(index).subId ==
+                                              selectedSubId
+                                          ? const Color(0xFF00194C)
+                                          : Colors.grey,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          subjects.elementAt(index).subCode,
+                                          style: const TextStyle(
+                                                  fontSize: 15.0,
+                                                  fontWeight: FontWeight.bold)
+                                              .copyWith(
+                                            color: subjects
+                                                        .elementAt(index)
+                                                        .subId ==
+                                                    selectedSubId
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            selectedSubId =
+                                                subjects.elementAt(index).subId;
+                                            setState(() {});
+                                          },
+                                          child: Text(
+                                            subjects.elementAt(index).subName,
+                                            style: const TextStyle(
+                                                    fontSize: 15.0,
+                                                    fontWeight: FontWeight.bold)
+                                                .copyWith(
+                                              color: subjects
+                                                          .elementAt(index)
+                                                          .subId ==
+                                                      selectedSubId
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        },
+                      ),
+                    ),
+                  ]),
             )
           ],
         ),
