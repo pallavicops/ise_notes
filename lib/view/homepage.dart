@@ -4,6 +4,7 @@ import 'package:notes_management_system/control/subject_control.dart';
 import 'package:notes_management_system/model/scheme_model.dart';
 import 'package:notes_management_system/model/semester_model.dart';
 import 'package:notes_management_system/model/subject_model.dart';
+import 'package:notes_management_system/view/notes_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../control/branch_control.dart';
@@ -277,7 +278,7 @@ class _HomepageState extends State<Homepage> {
                             ),
                           );
                         } else {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator();
                         }
                       }),
                 ],
@@ -376,43 +377,33 @@ class _HomepageState extends State<Homepage> {
                                 runSpacing: 20.0,
                                 children: List.generate(
                                   subjects.length,
-                                  (index) => Container(
-                                    padding: const EdgeInsets.all(10.0),
-                                    decoration: BoxDecoration(
-                                      color: subjects.elementAt(index).subId ==
-                                              selectedSubId
-                                          ? const Color(0xFF00194C)
-                                          : Colors.grey,
-                                      shape: BoxShape.rectangle,
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          subjects.elementAt(index).subCode,
-                                          style: const TextStyle(
-                                                  fontSize: 15.0,
-                                                  fontWeight: FontWeight.bold)
-                                              .copyWith(
-                                            color: subjects
-                                                        .elementAt(index)
-                                                        .subId ==
-                                                    selectedSubId
-                                                ? Colors.white
-                                                : Colors.black,
+                                  (index) => InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => NotePage(
+                                            subject: subjects.elementAt(index),
                                           ),
                                         ),
-                                        const SizedBox(
-                                          width: 20,
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            selectedSubId =
-                                                subjects.elementAt(index).subId;
-                                            setState(() {});
-                                          },
-                                          child: Text(
-                                            subjects.elementAt(index).subName,
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10.0),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            subjects.elementAt(index).subId ==
+                                                    selectedSubId
+                                                ? const Color(0xFF00194C)
+                                                : Colors.grey,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            subjects.elementAt(index).subCode,
                                             style: const TextStyle(
                                                     fontSize: 15.0,
                                                     fontWeight: FontWeight.bold)
@@ -425,8 +416,20 @@ class _HomepageState extends State<Homepage> {
                                                   : Colors.black,
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(
+                                            width: 20,
+                                          ),
+                                          Text(
+                                            subjects.elementAt(index).subName,
+                                            style: const TextStyle(
+                                                    fontSize: 15.0,
+                                                    fontWeight: FontWeight.bold)
+                                                .copyWith(
+                                              color: Colors.black,
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -445,6 +448,4 @@ class _HomepageState extends State<Homepage> {
       ),
     );
   }
-
-  schemasBasedOnSelectedBranch() {}
 }

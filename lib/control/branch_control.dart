@@ -5,7 +5,7 @@ class BranchControl {
   Future<List<BranchModel>> getBranches() async {
     final response = await http.get(
       Uri.parse(
-        "http://127.0.0.1:80/nms-server/api-branches.php",
+        "http://127.0.0.1:80/nms-server/api/branches.php",
       ),
     );
     if (response.statusCode == 200) {

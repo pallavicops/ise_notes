@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'ISE_NOTES',
+      title: 'AMC Notes Management System',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
       home: Homepage(),

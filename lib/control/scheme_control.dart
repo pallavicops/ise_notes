@@ -5,7 +5,7 @@ class SchemeControl {
   Future<List<SchemeModel>> getSchemes(String branchId) async {
     final response = await http.get(
       Uri.parse(
-        "http://127.0.0.1:80/nms-server/api-schemes.php?branch_id=$branchId",
+        "http://127.0.0.1:80/nms-server/api/schemes.php?branch_id=$branchId",
       ),
     );
     if (response.statusCode == 200) {
