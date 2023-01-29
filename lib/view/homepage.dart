@@ -31,27 +31,7 @@ class _HomepageState extends State<Homepage> {
   String? selectedSemId;
   List<SubModel> subjects = [];
   String? selectedSubId;
-  // List<String> semesters = [
-  //   '1st',
-  //   '2nd',
-  //   '3rd',
-  //   '4th',
-  //   '5th',
-  //   '6th',
-  //   '7th',
-  //   '8th'
-  // ];
-  // List<String> subjects = [
-  //   'First',
-  //   'second',
-  //   'Third',
-  //   'Fourth',
-  //   'Fifth',
-  //   'Sixth',
-  //   'Seventh',
-  //   'Eight'
-  // ];
-
+  final TextEditingController _searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,16 +53,47 @@ class _HomepageState extends State<Homepage> {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width - 505,
-                  height: 50,
-                  alignment: Alignment.centerLeft,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.search),
+                  alignment: Alignment.center,
+                  child: TextFormField(
+                    obscureText: false,
+                    controller: _searchController,
+                    textAlignVertical: TextAlignVertical.center,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Search by Subject Code(eg: 18CSL67)',
+                      prefixIcon: const Icon(
+                        Icons.subject,
+                        color: Color(0xFF00194C),
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          if (_searchController.text.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NotePage(
+                                  subject: SubModel(
+                                    subCode: _searchController.text,
+                                    subId: '',
+                                    subName: '',
+                                    semId: '',
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.search,
+                          color: Color(0xFF00194C),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],

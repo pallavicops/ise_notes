@@ -23,7 +23,7 @@ class SubModel {
   String subName;
   String semId;
 
-  factory SubModel.fromJson(Map<String, dynamic> json) => SubModel(
+  factory SubModel.fromJson(Map<dynamic, dynamic> json) => SubModel(
         subId: json["sub_id"],
         subCode: json["sub_code"],
         subName: json["sub_name"],

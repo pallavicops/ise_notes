@@ -69,7 +69,7 @@ class _NotePageState extends State<NotePage> {
                   if (snapshot.hasData) {
                     final notes = snapshot.data!;
                     return ListView.separated(
-                      itemCount: 5,
+                      itemCount: notes.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -82,7 +82,7 @@ class _NotePageState extends State<NotePage> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0)),
                                 Text(
-                                  'Author_name',
+                                  notes.elementAt(index).authorName ?? '',
                                   style: const TextStyle(
                                       fontSize: 15.0, color: Colors.grey),
                                 ),
@@ -122,7 +122,9 @@ class _NotePageState extends State<NotePage> {
                       },
                     );
                   } else {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                      child: Text("No Post"),
+                    );
                   }
                 },
               ),
