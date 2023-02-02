@@ -117,6 +117,10 @@ class _HomepageState extends State<Homepage> {
                             selectedBranchId =
                                 branches.elementAt(index).branchId;
 
+                            // Other selection should return to default
+                            selectedSubId = null;
+                            selectedSchemeId = null;
+                            selectedSemId = null;
                             setState(() {});
                           },
                           style: ButtonStyle(
@@ -199,6 +203,9 @@ class _HomepageState extends State<Homepage> {
                                         onPressed: () {
                                           selectedSchemeId =
                                               schemes.elementAt(index).schemeId;
+
+                                          selectedSubId = null;
+                                          selectedSemId = null;
                                           setState(() {});
                                         },
                                         child: Text(
