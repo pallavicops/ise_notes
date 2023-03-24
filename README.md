@@ -4,7 +4,7 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project that aims to provide college students with easy access to high-quality notes and study materials for their classes. 
 
 A few resources to get you started if this is your first Flutter project:
 
