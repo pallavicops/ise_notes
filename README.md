@@ -1,4 +1,4 @@
-# ise_notes
+# AMC Engineering Notes System
 
 A new Flutter project.
 
