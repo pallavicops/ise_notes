@@ -1,6 +1,6 @@
 # AMC Engineering Notes System
 
-This project that aims to provide college students with easy access to high-quality notes and study materials for their classes. 
+The project that aims to provide college students with easy access to high-quality notes and study materials for their classes. . This system utilizes advanced database management techniques to efficiently store, organize, and retrieve syllabus content for various classes. The project is built using the latest web technologies and is designed to be user -friendly and easy to navigate.
 
 ## Screenshots
 
