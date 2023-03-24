@@ -1,10 +1,11 @@
 # AMC Engineering Notes System
 
-A new Flutter project.
-
-## Getting Started
-
 This project that aims to provide college students with easy access to high-quality notes and study materials for their classes. 
+
+## Screenshorts
+
+
+
 
 A few resources to get you started if this is your first Flutter project:
 
